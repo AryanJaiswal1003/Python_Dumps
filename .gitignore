@@ -1,0 +1,60 @@
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+.venv/
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+
+# Logs
+*.log
+*.out
+*.err
+
+# Databases
+*.sqlite3
+*.db
+
+# Environment variables
+*.env
+.env.*
+
+# SQL dump files
+*.sql
+*.bak
+
+# IDEs and editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# Unit test / coverage reports
+htmlcov/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+
+# Compiled C/C++
+*.o
+*.so
+*.exe
+*.dll
