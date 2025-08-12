@@ -33,11 +33,11 @@ while will_continue:
         num1 = float(input("Enter your First Number: "))
 
     # Ask user for operator and second number
-    operator = input("Choose the Operator you want to Perform ['+', '-', '*', '/']: ")
+    operator = input("Choose the Operator you want to Perform \n'+'\n'-'\n'*'\n'/'\nOperator: ")
     num2 = float(input("Enter your Second Number: "))
 
     if operator in maths_dict: # Perform calculation if operator is valid
-        result = maths_dict[operator](num1, num2)
+        result = maths_dict[operator](n1 = num1, n2 = num2)
         print(f"Result: [{num1} {operator} {num2}] --> {result}")
     else:
         print("Invalid operator. Please choose from '+', '-', '*', '/'.")
@@ -50,4 +50,5 @@ while will_continue:
         print(logo)
         num1 = None # Reset num1 to start a new calculation
     else:
+
         num1 = result # Use previous result as new num1 for next calculation
