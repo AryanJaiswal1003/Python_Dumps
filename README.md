@@ -40,3 +40,4 @@ This course has been instrumental in helping me:
 If you'd like to connect, discuss Python, collaborate, help me on projects, feel free to reach out!
 
 * Email Id: aryanjaiswal1003@yahoo.com
+* LinkedIn: https://www.linkedin.com/in/jaiswal-ar/
