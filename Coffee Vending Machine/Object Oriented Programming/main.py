@@ -24,6 +24,7 @@ while not is_on:
     # If user requests a report, print current resource status
     if user_input == 'report':
         coffee_maker.report()
+        money_machine.report()
 
     # If user enters 'off', terminate the loop and shut down the machine
     if user_input == 'off':
