@@ -24,15 +24,11 @@ This is a classic Snake Game built using Python’s Turtle Graphics module and O
 ## Project Structure
 📂 Snake_Game
  
- 📜 main.py         # Main game loop & controls
- 
- 📜 snake.py        # Snake class (movement & body handling)
- 
- 📜 food.py         # Food class (randomly placed food)
- 
- 📜 scoreboard.py   # Scoreboard class (score display & game over)
- 
- 📜 README.md       # Documentation
+    📜 main.py         # Main game loop & controls
+    📜 snake.py        # Snake class (movement & body handling)
+    📜 food.py         # Food class (randomly placed food)
+    📜 scoreboard.py   # Scoreboard class (score display & game over)
+    📜 README.md       # Documentation
 
 ---
 
@@ -44,3 +40,4 @@ This is a classic Snake Game built using Python’s Turtle Graphics module and O
 4. Modularity: Clear separation of game components.
 
 5. Slicing: Extracting a portion (subsequence) of a list, tuple, string, or any sequence type --> [start:end:step].
+
