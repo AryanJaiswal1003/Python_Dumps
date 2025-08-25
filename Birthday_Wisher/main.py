@@ -14,9 +14,7 @@ today = (today_month, today_day) # Tuple (month, day) for easy matching
 data = pandas.read_csv("birthdays.csv") # 2. Read the birthdays.csv file
 
 # 3. Create a dictionary where the key = (month, day) and value = dict of name/email
-birthdays_dict = {(value["month"], value["day"]): {"name": value["name"], "email": value["email"]}
-    for (index, value) in data.iterrows()
-}
+birthdays_dict = {(value["month"], value["day"]): value for (index, value) in data.iterrows()}
 
 if (today_month, today_day) in birthdays_dict: # 4. Check if today matches any birthday
     
