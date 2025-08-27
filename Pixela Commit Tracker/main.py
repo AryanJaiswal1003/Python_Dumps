@@ -27,7 +27,7 @@ user_params = {
 # Try creating a user account. If it already exists, Pixela returns "already exist"
 response_1 = requests.post(url=pixela_endpoint, json=user_params)
 
-if response_1.status_code == 200 or "already exist" in response_1.text.lower():
+if response_1.status_code == 200:
     print("✅ User exists or created successfully")
 else:
     print("⚠️ User creation error:", response_1.text)
@@ -46,7 +46,7 @@ graph_config = {
 # Attempt to create the graph. If the graph already exists, Pixela returns "already exist"
 response_2 = requests.post(url=graph_endpoint, json=graph_config, headers=HEADERS)
 
-if response_2.status_code == 200 or "already exist" in response_2.text.lower():
+if response_2.status_code == 200:
     print("✅ Graph exists or created successfully")
 else:
     print("⚠️ Graph creation error:", response_2.text)
@@ -99,4 +99,5 @@ response_5 = requests.delete(url=delete_endpoint, headers=HEADERS)
 if response_5.status_code == 200:
     print("✅ Pixel deleted")
 else:
+
     print("⚠️ Pixel deletion error:", response_5.text)
