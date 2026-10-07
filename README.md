@@ -1,43 +1,37 @@
-# 🐍 My Python Learning Journey
+# Python Learning Projects
 
-Welcome to my Python projects repository!
-This is where I track my progress, showcase mini-projects, and document everything I’ve learned while mastering Python programming.
+Welcome to my Python projects repository. It documents my progress as I develop Python programming skills through
+hands-on exercises and practical projects.
 
----
+## Learning Path
 
-## 📚 Learning Path
+My learning plan covers core programming concepts and their practical application:
 
-I’m currently learning Python as part of a structured journey that focuses on building both **core programming skills** and **practical project experience**.
-My approach is:
+1. **Python fundamentals:** Syntax, variables, data types, loops, and conditionals.
+2. **Intermediate Python:** Functions, modules, file handling, and error handling.
+3. **Object-oriented programming:** Classes, objects, inheritance, and encapsulation.
+4. **Advanced topics:** Decorators, generators, and working with APIs.
+5. **Applied projects:** Practical tools, applications, and games.
 
-1. **Master the Basics** → Syntax, variables, data types, loops, and conditionals.
-2. **Intermediate Skills** → Functions, modules, file handling, and error handling.
-3. **Object-Oriented Programming (OOP)** → Classes, objects, inheritance, and encapsulation.
-4. **Advanced Topics** → Decorators, generators, and working with APIs.
-5. **Applied Projects** → Building real-world tools and games.
+## Course
 
----
+This repository is also informed by Angela Yu's *100 Days of Code: The Complete Python Pro Bootcamp for 2024*.
+The course provides structured daily challenges and practical projects that reinforce Python concepts.
 
-## 🎓 About the Course
+## Goals
 
-A significant part of my learning is based on **Angela Yu’s \[100 Days of Code: The Complete Python Pro Bootcamp for 2024]** on Udemy.
-This course has been instrumental in helping me:
+- Complete the 100 Days of Python curriculum.
+- Continue learning data science and SQL for analytics.
+- Explore artificial intelligence, machine learning, and ethical hacking.
 
-* Build a **strong foundation** in Python.
-* Learn **step-by-step** through daily coding challenges.
-* Gain confidence with **real-world projects** from day one.
+## Dependencies
 
----
-
-## 🚀 Goals
-
-* Complete the full 100 Days of Python curriculum.
-* Move on to **Data Science** and **SQL** for analytics.
-* Explore **AI/ML** and **Ethical Hacking** in the future.
+Some projects use third-party Python libraries. Install the dependencies required by an individual project before
+running it; dependency lists may be provided in that project's documentation.
 
 ## Contact
 
-If you'd like to connect, discuss Python, collaborate, help me on projects, feel free to reach out!
+For questions, collaboration, or project discussions, you can reach me at:
 
-* Email Id: aryanjaiswal1003@yahoo.com
-* LinkedIn: https://www.linkedin.com/in/jaiswal-ar/
+- **Email:** aryanjaiswal1003@yahoo.com
+- **LinkedIn:** [linkedin.com/in/jaiswal-ar](https://www.linkedin.com/in/jaiswal-ar/)

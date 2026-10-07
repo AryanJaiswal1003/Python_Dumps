@@ -13,15 +13,15 @@ nato_dict = {value['letter']: value['code'] for _, value in data_frame.iterrows(
 is_true = True
 
 while is_true:
-  user_input = input("Enter a Word: ").upper()
-  """
-  # Convert the user input into a list of phonetic code words. For each character in input, look up its code in dictionary.
-  # If the character exists in the dictionary, add its code word to the list
-  """
-  try:
-      phonetic_alphabet = [nato_dict[letter] for letter in user_input] # Try to convert each letter to its NATO phonetic code
-      print(phonetic_alphabet)
-      is_true = False  # Stop loop after successful conversion
+    user_input = input("Enter a Word: ").upper()
+    """
+    # Convert the user input into a list of phonetic code words. For each character in input, look up its code in dictionary.
+    # If the character exists in the dictionary, add its code word to the list
+    """
+    try:
+        phonetic_alphabet = [nato_dict[letter] for letter in user_input] # Try to convert each letter to its NATO phonetic code
+        print(phonetic_alphabet)
+        is_true = False  # Stop loop after successful conversion
 
-  except KeyError:
-      print("Sorry, only Letters in the alphabet please.\n")
+    except KeyError:
+        print("Sorry, only Letters in the alphabet please.\n")
