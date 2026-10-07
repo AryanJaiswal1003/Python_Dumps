@@ -1,7 +1,9 @@
-from tkinter import *
+from tkinter import Button, Canvas, Label, PhotoImage, Tk
+from pathlib import Path
 from quiz_brain import QuizBrain
 
 THEME_COLOR = "#375362"
+PROJECT_DIR = Path(__file__).resolve().parent
 
 class QuizInterface:
 
@@ -36,11 +38,11 @@ class QuizInterface:
         )
 
         # -------------------- Buttons --------------------
-        self.wrong_img = PhotoImage(file="images/false.png")
+        self.wrong_img = PhotoImage(file=str(PROJECT_DIR / "images" / "false.png"))
         self.wrong_button = Button(image=self.wrong_img, highlightthickness=0, borderwidth=0, command=self.false_pressed)
         self.wrong_button.grid(row=3, column=1)
 
-        self.right_img = PhotoImage(file="images/true.png")
+        self.right_img = PhotoImage(file=str(PROJECT_DIR / "images" / "true.png"))
         self.right_button = Button(image=self.right_img, highlightthickness=0, borderwidth=0, command=self.true_pressed)
         self.right_button.grid(row=3, column=0)
 

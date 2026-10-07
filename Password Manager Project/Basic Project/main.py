@@ -1,9 +1,11 @@
-from tkinter import *
+from tkinter import Button, Canvas, Entry, Label, PhotoImage, Tk
 from tkinter import messagebox
 from random import choice, randint, shuffle
+from pathlib import Path
 import pyperclip
 
 FONT = ("Times New Roman", 12, "bold")
+PROJECT_DIR = Path(__file__).resolve().parent
 
 # ---------------------------- PASSWORD GENERATOR ------------------------------- #
 def generate_password():
@@ -45,7 +47,7 @@ def save():
         ) # Ask confirmation before saving
 
         if is_ok:
-            with open("data.txt", mode="a") as data_file:
+            with (PROJECT_DIR / "data.txt").open(mode="a", encoding="utf-8") as data_file:
                 data_file.write(f"{website} | {email} | {password}\n") # Append data into file
 
         messagebox.showinfo(title="Success", message="Password Entered is Saved.") # Show success message
@@ -69,7 +71,7 @@ window.config(pady=50, padx=50)
 
 # Logo Image
 canvas = Canvas(width=200, height=200, highlightthickness=0)
-lock_image = PhotoImage(file="logo.png")
+lock_image = PhotoImage(file=str(PROJECT_DIR / "logo.png"))
 canvas.create_image(100, 100, image=lock_image)
 canvas.grid(row=0, column=1)
 

@@ -2,8 +2,10 @@
 import datetime as dt
 import random
 import smtplib
+from pathlib import Path
 import pandas
 
+PROJECT_DIR = Path(__file__).resolve().parent
 
 # 1. Get today's date
 now = dt.datetime.now()
@@ -11,10 +13,10 @@ today_month = now.month
 today_day = now.day
 today = (today_month, today_day) # Tuple (month, day) for easy matching
 
-data = pandas.read_csv("birthdays.csv") # 2. Read the birthdays.csv file
+data = pandas.read_csv(PROJECT_DIR / "birthdays.csv") # 2. Read the birthdays.csv file
 
 # 3. Create a dictionary where the key = (month, day) and value = dict of name/email
-birthdays_dict = {(value["month"], value["day"]): value for (index, value) in data.iterrows()}
+birthdays_dict = {(value["month"], value["day"]): value for _, value in data.iterrows()}
 
 if (today_month, today_day) in birthdays_dict: # 4. Check if today matches any birthday
     
@@ -24,7 +26,7 @@ if (today_month, today_day) in birthdays_dict: # 4. Check if today matches any b
 
     # 5. Choose a random letter template (letter_1.txt, letter_2.txt, letter_3.txt)
     letter_number = random.randint(1, 3)
-    file_path = f"letter_templates/letter_{letter_number}.txt"
+    file_path = PROJECT_DIR / "letter_templates" / f"letter_{letter_number}.txt"
 
     with open(file_path) as letter_file: # 6. Open the letter template and replace [NAME] with actual name
         letter_contents = letter_file.read()
@@ -44,6 +46,4 @@ if (today_month, today_day) in birthdays_dict: # 4. Check if today matches any b
             to_addrs=email,
             msg=f"Subject:Happy Birthday {name}!!\n\n{personalized_letter}"
         )  # Send the email with subject + random quote
-
-
 

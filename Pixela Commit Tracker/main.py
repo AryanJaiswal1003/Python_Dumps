@@ -9,6 +9,8 @@ from datetime import datetime, timedelta
 load_dotenv()
 USERNAME = os.getenv("PIXELA_USERNAME") # Your Pixela username
 TOKEN = os.getenv("PIXELA_TOKEN") # Your Pixela authentication token
+if not USERNAME or not TOKEN:
+    raise ValueError("PIXELA_USERNAME and PIXELA_TOKEN must be set in the environment or .env file.")
 
 # Authentication headers for Pixela API requests
 HEADERS = {
@@ -92,7 +94,7 @@ else:
 
 
 # ------------------- Step 5: Delete a Pixel (remove today's data if needed) -------------------
-delete_endpoint = f"{graph_post_endpoint}/{today.strftime(format="%Y%m%d")}" # Endpoint to delete today’s pixel (use carefully!)
+"""delete_endpoint = f"{graph_post_endpoint}/{today.strftime(format="%Y%m%d")}" # Endpoint to delete today’s pixel (use carefully!)
 
 response_5 = requests.delete(url=delete_endpoint, headers=HEADERS)
 
@@ -100,4 +102,4 @@ if response_5.status_code == 200:
     print("✅ Pixel deleted")
 else:
 
-    print("⚠️ Pixel deletion error:", response_5.text)
+    print("⚠️ Pixel deletion error:", response_5.text)"""

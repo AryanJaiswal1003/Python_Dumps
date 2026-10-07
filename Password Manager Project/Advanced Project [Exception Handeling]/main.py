@@ -1,8 +1,12 @@
 import json
-from tkinter import *
+from tkinter import Button, Canvas, Entry, Label, PhotoImage, Tk
 from tkinter import messagebox
 from random import choice, randint, shuffle
+from pathlib import Path
 import pyperclip
+
+PROJECT_DIR = Path(__file__).resolve().parent
+DATA_FILE = PROJECT_DIR / "data.json"
 
 # ---------------------------- FIND PASSWORD ------------------------------- #
 def find_password():
@@ -10,7 +14,7 @@ def find_password():
 
     search = website_entry.get().title() # Get input & convert to Title Case
     try:
-        with open("data.json", mode="r") as data_file:
+        with DATA_FILE.open(mode="r", encoding="utf-8") as data_file:
             data = json.load(data_file) # Load saved credentials
             if search in data: # If website exists in file
                 saved_data = data[search]
@@ -75,22 +79,22 @@ def save():
         messagebox.showinfo(title="Oops", message="Please make sure you haven't left any fields empty.")
     else:
         try: # Try to read existing data
-            with open("data.json", mode= "r") as data_file:
+            with DATA_FILE.open(mode="r", encoding="utf-8") as data_file:
                 data = json.load(data_file) # Reading Old Data
 
         except FileNotFoundError: # If file doesn’t exist, create it and dump new_data
-            with open("data.json", mode= "w") as data_file:
+            with DATA_FILE.open(mode="w", encoding="utf-8") as data_file:
                 json.dump(new_data, data_file, indent=4) # Creates New JSON File
 
         else: # Updating old data with new data
             data.update(new_data)
-            with open("data.json",mode="w") as data_file:
+            with DATA_FILE.open(mode="w", encoding="utf-8") as data_file:
                 json.dump(data, data_file, indent=4) # Saving the updated data
 
         finally: # Clear input fields after saving
-            website_entry.delete(0, END)
-            password_entry.delete(0, END)
-            email_entry.delete(0, END)
+            website_entry.delete(0, "end")
+            password_entry.delete(0, "end")
+            email_entry.delete(0, "end")
             website_entry.focus()
 
 
@@ -101,7 +105,7 @@ window.config(padx=50, pady=50)
 
 ######### Logo #########
 canvas = Canvas(height=200, width=200)
-logo_img = PhotoImage(file="logo.png")
+logo_img = PhotoImage(file=str(PROJECT_DIR / "logo.png"))
 canvas.create_image(100, 100, image=logo_img)
 canvas.grid(row=0, column=1)
 

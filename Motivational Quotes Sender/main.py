@@ -1,7 +1,9 @@
 import smtplib
 import datetime as dt
 import random
+from pathlib import Path
 
+PROJECT_DIR = Path(__file__).resolve().parent
 # Your email credentials
 my_email = "your_email"
 password = "your_app_password" # <-- App password, not your real Gmail password
@@ -11,7 +13,7 @@ day = now.strftime("%A") # Get full weekday name e.g. Monday, Tuesday
 
 
 if True: # sends mail everyday
-    with open("quotes.txt") as quotes: # Open the file and read all quotes into a list
+    with (PROJECT_DIR / "quotes.txt").open(encoding="utf-8") as quotes: # Open the file and read all quotes into a list
         all_quotes = quotes.readlines()
         quote = random.choice(all_quotes).strip() # .strip() removes newline (\n) and extra spaces so the email looks clean
 

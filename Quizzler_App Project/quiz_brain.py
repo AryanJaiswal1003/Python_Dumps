@@ -26,11 +26,14 @@ class QuizBrain:
         return f"Q.{self.question_number}: {q_text}"
 
 
-    def check_answer(self, user_answer:bool):
+    def check_answer(self, user_answer: str) -> bool:
         """
             Checks the user's answer against the correct answer. Increases the score if the answer is correct.
                 Returns True if correct, False otherwise.
         """
+        if self.current_question is None:
+            raise RuntimeError("Cannot check an answer before asking a question.")
+
         correct_answer = self.current_question.answer
         if user_answer == correct_answer:
             self.score += 1

@@ -1,6 +1,14 @@
-with open("Input/Names/invited_names.txt") as name_file: # Open the file containing the list of invited names
+from pathlib import Path
 
-    with open("Input/Letters/starting_letter.txt") as letter_file:  # Open the file containing the letter template
+PROJECT_DIR = Path(__file__).resolve().parent
+NAMES_FILE = PROJECT_DIR / "Input" / "Names" / "invited_names.txt"
+LETTER_FILE = PROJECT_DIR / "Input" / "Letters" / "starting_letter.txt"
+OUTPUT_DIR = PROJECT_DIR / "Output" / "ReadyToSend"
+OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+
+with NAMES_FILE.open(encoding="utf-8") as name_file: # Open the file containing the list of invited names
+
+    with LETTER_FILE.open(encoding="utf-8") as letter_file:  # Open the file containing the letter template
         letter_template = letter_file.read() # Read the contents of the letter template into a variable
 
         # Loop through each name in the invited names file
@@ -9,7 +17,7 @@ with open("Input/Names/invited_names.txt") as name_file: # Open the file contain
             personalized_letter = letter_template.replace("[name]", stripped_name) # Replace the placeholder [name] in the template with the actual name
 
             # Creating new personalized letter file for each name in the "ReadyToSend" folder
-            with open(f"Output/ReadyToSend/{stripped_name}.txt", mode="w") as output_files:
+            with (OUTPUT_DIR / f"{stripped_name}.txt").open(mode="w", encoding="utf-8") as output_files:
                 output_files.write(personalized_letter) # Write the personalized letter content
 
 """

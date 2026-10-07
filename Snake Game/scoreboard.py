@@ -1,8 +1,10 @@
 from turtle import Turtle
+from pathlib import Path
 
 # TODO - 6: CREATING SCOREBOARD & UPDATING THE SCORES
 ALIGN = "center"
 FONT = ("Times New Roman", 15, "normal")
+SCORE_FILE = Path(__file__).resolve().with_name("score.txt")
 
 class Score(Turtle):
     """Handles the scoreboard display, score updates, and high score tracking."""
@@ -16,7 +18,7 @@ class Score(Turtle):
         self.score = 0 # Instance variable for score
 
         # Open score.txt to fetch previously stored high score
-        with open("score.txt") as high_score:
+        with SCORE_FILE.open(encoding="utf-8") as high_score:
             self.high_score = int(high_score.read())
 
         self.update_score() # Display the initial scoreboard when the game starts
@@ -47,7 +49,7 @@ class Score(Turtle):
         - Otherwise, just reset score to 0 and refresh scoreboard.
         """
         if self.score > self.high_score:
-            with open("score.txt", mode="w") as stored_score:
+            with SCORE_FILE.open(mode="w", encoding="utf-8") as stored_score:
                 self.high_score = self.score
                 stored_score.write(str(self.high_score))  # Save new high score
         self.score = 0 # Reset current score

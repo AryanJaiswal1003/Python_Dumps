@@ -8,10 +8,10 @@ __pycache__/
 *.pyo
 *.pyd
 .Python
-env/
+.env
 venv/
 ENV/
-.venv/
+.venv
 
 # Jupyter Notebooks
 .ipynb_checkpoints
@@ -34,7 +34,7 @@ ENV/
 *.bak
 
 # IDEs and editors
-.vscode/
+.vscode
 .idea/
 *.sublime-project
 *.sublime-workspace
@@ -58,3 +58,4 @@ coverage.xml
 *.so
 *.exe
 *.dll
+*.pyc

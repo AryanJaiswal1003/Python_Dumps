@@ -1,5 +1,4 @@
-from art import logo
-print(logo)
+print("Welcome to the Silent Auction")
 
 # Function to find and print the highest bidder
 def highest_bidder(bids):

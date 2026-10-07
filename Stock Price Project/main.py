@@ -1,75 +1,141 @@
+import math
 import os
+from pathlib import Path
+from typing import Any
+
 import requests
 from dotenv import load_dotenv
+from twilio.base.exceptions import TwilioRestException
 from twilio.rest import Client
 
-load_dotenv() # Load environment variables from .env file
+load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
-# ------------------- CONSTANTS ------------------- #
 STOCK_NAME = "TSLA"
 COMPANY_NAME = "Tesla Inc"
-
 STOCK_ENDPOINT = "https://www.alphavantage.co/query"
-STOCK_API_KEY = os.getenv("ALPHA_VANTAGE_API_KEY")
-
 NEWS_ENDPOINT = "https://newsapi.org/v2/everything"
-NEWS_API_KEY = os.getenv("NEWS_API_KEY")
+REQUEST_TIMEOUT = 30
 
-TWILIO_SID = os.getenv("TWILIO_SID")
-TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
 
-# ------------------- STEP 1: Get Stock Data ------------------- #
-# Request daily stock prices for the given stock symbol
-stock_parameters = {
-    "function":"TIME_SERIES_DAILY",
-    "symbol":STOCK_NAME,
-    "apikey":STOCK_API_KEY
-}
-stock_response = requests.get(url=STOCK_ENDPOINT, params=stock_parameters)
-stock_response.raise_for_status()
-stock_data = stock_response.json()["Time Series (Daily)"]
+def required_setting(name: str) -> str:
+    value = os.getenv(name)
+    if not value or not value.strip():
+        raise ValueError(f"{name} must be configured in the environment or repository .env file.")
+    return value.strip()
 
-# Extract the last two closing prices using list comprehension
-closing_price = [float(value['4. close']) for (date, value) in stock_data.items()]
 
-yesterday_closing = closing_price[0]       # Closing price yesterday
-day_before_closing = closing_price[1]      # Closing price the day before yesterday
-
-# ------------------- STEP 2: Calculate Price Change ------------------- #
-price_diff = yesterday_closing - day_before_closing
-
-up_down = "💹" if price_diff > 0 else "📉" # Add indicator emoji for up or down_trend
-
-percentage_change = round((price_diff * 100)/day_before_closing) # Calculate percentage change
-
-# ------------------- STEP 3: Get News if Change is Significant ------------------- #
-# Only fetch news if absolute change is greater than 1%
-if abs(percentage_change) > 1:
-    news_parameters = {
-        "qInTitle": COMPANY_NAME,
-        "apiKey": NEWS_API_KEY
+def get_stock_closes() -> tuple[float, float]:
+    parameters = {
+        "function": "TIME_SERIES_DAILY",
+        "symbol": STOCK_NAME,
+        "apikey": required_setting("ALPHA_VANTAGE_API_KEY"),
     }
+    response = requests.get(STOCK_ENDPOINT, params=parameters, timeout=REQUEST_TIMEOUT)
+    if not response.ok:
+        raise RuntimeError(f"Alpha Vantage returned HTTP {response.status_code}.")
 
-    news_response = requests.get(url=NEWS_ENDPOINT, params=news_parameters)
-    news_response.raise_for_status()
-    news_data = news_response.json()["articles"]
+    try:
+        payload: Any = response.json()
+    except requests.exceptions.JSONDecodeError as error:
+        raise RuntimeError("Alpha Vantage returned an invalid JSON response.") from error
 
-    three_articles = news_data[:3] # Select top 3 articles
+    if not isinstance(payload, dict):
+        raise RuntimeError("Alpha Vantage returned an unexpected response format.")
 
-    # Format the articles into messages
-    formatted_articles = [
-            f"{STOCK_NAME}: {up_down}{percentage_change}%\n"
-            f"Headlines: {article['title']}.\n"
-            f"Brief: {article['description']}"
-        for article in three_articles
+    time_series = payload.get("Time Series (Daily)")
+    if not isinstance(time_series, dict):
+        api_message = next(
+            (
+                payload[key]
+                for key in ("Error Message", "Information", "Note")
+                if isinstance(payload.get(key), str)
+            ),
+            "The response did not contain daily stock data.",
+        )
+        raise RuntimeError(f"Alpha Vantage did not return daily stock data: {api_message}")
+
+    try:
+        recent_dates = sorted(time_series, reverse=True)[:2]
+        if len(recent_dates) < 2:
+            raise ValueError("fewer than two daily prices were returned")
+        closes = [float(time_series[date]["4. close"]) for date in recent_dates]
+    except (KeyError, TypeError, ValueError) as error:
+        raise RuntimeError("Alpha Vantage returned malformed daily closing prices.") from error
+
+    if not all(math.isfinite(close) for close in closes):
+        raise RuntimeError("Alpha Vantage returned a non-finite closing price.")
+    if closes[1] == 0:
+        raise RuntimeError("The previous closing price is zero; percentage change cannot be calculated.")
+
+    return closes[0], closes[1]
+
+
+def get_news_articles() -> list[dict[str, Any]]:
+    parameters = {
+        "qInTitle": COMPANY_NAME,
+        "apiKey": required_setting("NEWS_API_KEY"),
+    }
+    response = requests.get(NEWS_ENDPOINT, params=parameters, timeout=REQUEST_TIMEOUT)
+    if not response.ok:
+        raise RuntimeError(f"News API returned HTTP {response.status_code}.")
+
+    try:
+        payload: Any = response.json()
+    except requests.exceptions.JSONDecodeError as error:
+        raise RuntimeError("News API returned an invalid JSON response.") from error
+
+    articles = payload.get("articles") if isinstance(payload, dict) else None
+    if not isinstance(articles, list):
+        message = payload.get("message") if isinstance(payload, dict) else None
+        detail = message if isinstance(message, str) else "The response did not contain an articles list."
+        raise RuntimeError(f"News API did not return articles: {detail}")
+
+    return [article for article in articles if isinstance(article, dict)][:3]
+
+
+def send_alerts(messages: list[str]) -> None:
+    account_sid = required_setting("TWILIO_SID")
+    auth_token = required_setting("TWILIO_AUTH_TOKEN")
+    from_number = required_setting("TWILIO_FROM_NUMBER")
+    to_number = required_setting("TWILIO_TO_NUMBER")
+
+    for name, number in (("TWILIO_FROM_NUMBER", from_number), ("TWILIO_TO_NUMBER", to_number)):
+        if not number.startswith("+") or not number[1:].isdigit():
+            raise ValueError(f"{name} must be a phone number in E.164 format, such as +15551234567.")
+
+    client = Client(account_sid, auth_token)
+    try:
+        for message in messages:
+            client.messages.create(body=message, from_=from_number, to=to_number)
+    except TwilioRestException as error:
+        raise RuntimeError(f"Twilio could not send the alert (HTTP {error.status}). Check your account and numbers.") from error
+
+
+def main() -> None:
+    latest_close, previous_close = get_stock_closes()
+    price_change = latest_close - previous_close
+    percentage_change = price_change / previous_close * 100
+
+    if abs(percentage_change) <= 1:
+        print(f"{STOCK_NAME} changed {percentage_change:.2f}%; no alert needed.")
+        return
+
+    direction = "💹" if price_change > 0 else "📉"
+    articles = get_news_articles()
+    messages = [
+        f"{STOCK_NAME}: {direction}{percentage_change:.2f}%\n"
+        f"Headline: {article.get('title') or 'No title'}\n"
+        f"Brief: {article.get('description') or 'No description'}"
+        for article in articles
     ]
 
-    # ------------------- STEP 4: Send SMS via Twilio ------------------- #
-    client = Client(TWILIO_SID, TWILIO_AUTH_TOKEN)
+    if not messages:
+        print("No Tesla news articles were returned; no SMS alerts sent.")
+        return
 
-    for article in formatted_articles:
-        message = client.messages.create(
-            body=article,
-            from_= "TWILIO_VIRTUAL_NUM",  # Replace with your Twilio number in E.164 format
-            to= "YOUR_NUMBER"             # Replace with your verified phone number in E.164 format
-        )
+    send_alerts(messages)
+    print(f"Sent {len(messages)} stock alert(s).")
+
+
+if __name__ == "__main__":
+    main()

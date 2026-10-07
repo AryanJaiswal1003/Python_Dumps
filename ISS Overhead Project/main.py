@@ -10,15 +10,20 @@ load_dotenv() # Load environment variables from .env file
 MY_LAT = -22.572645
 MY_LONG = 88.363892
 ISS_ENDPOINT = os.getenv("ISS_ENDPOINT") # ISS API endpoint
+if not ISS_ENDPOINT:
+    raise ValueError("ISS_ENDPOINT must be set in the environment or .env file.")
 
-USERNAME = "your_email@gmail.com" # Your email
+USERNAME = os.getenv("USERNAME") # Your email
 PASSWORD = os.getenv("GMAIL_APP_PASSWORD") # App password (stored in .env)
 
 
 def is_iss_overhead():
     """Check if ISS is within +5/-5 degrees of your position."""
 
-    iss_response = requests.get(url=ISS_ENDPOINT)
+    endpoint = ISS_ENDPOINT
+    if endpoint is None:
+        raise ValueError("ISS_ENDPOINT must be set in the environment or .env file.")
+    iss_response = requests.get(url=endpoint)
     iss_response.raise_for_status()
     data = iss_response.json()
 
@@ -58,6 +63,10 @@ while True:
     time.sleep(60) # Main loop: check every 60 seconds
 
     if is_iss_overhead() and is_night():
+        if PASSWORD is None:
+            raise ValueError("GMAIL_APP_PASSWORD must be set before sending an email.")
+        if USERNAME is None:
+            raise ValueError("USERNAME must be set before sending an email.")
         with smtplib.SMTP("smtp.gmail.com", port=587) as connection:
             connection.starttls()
             connection.login(user=USERNAME, password=PASSWORD)

@@ -1,5 +1,8 @@
-from tkinter import *
+from tkinter import Button, Canvas, Label, PhotoImage, Tk
 import math
+from pathlib import Path
+
+PROJECT_DIR = Path(__file__).resolve().parent
 # ---------------------------- CONSTANTS ------------------------------- #
 PINK = "#e2979c"
 RED = "#e7305b"
@@ -16,19 +19,20 @@ LONG_BREAK_MIN = 20
 reps = 0 # Keeps track of how many sessions have passed
 timer = None  # Stores the reference for window.after() so it can be cancelled
 
-# ---------------------------- TIMER RESET ------------------------------- # 
+# ---------------------------- TIMER RESET ------------------------------- #
 
 def reset_timer():
     """Stops the current timer and resets everything back to initial state."""
     global reps
     reps = 0
-    window.after_cancel(timer) # Cancels the scheduled countdown
+    if timer is not None:
+        window.after_cancel(timer) # Cancels the scheduled countdown
     tick_label.config(text="") # Removes all check marks
     pomodoro_canvas.itemconfig(timer_text, text="00:00") # Reset timer text
     timer_label.config(text="Timer") # Reset title label
 
 
-# ---------------------------- TIMER MECHANISM ------------------------------- # 
+# ---------------------------- TIMER MECHANISM ------------------------------- #
 
 def start_timer():
     """Decides whether to start a Work session, Short Break, or Long Break."""
@@ -51,7 +55,7 @@ def start_timer():
         count_down(work_sec)
         timer_label.config(text="Work")
 
-# ---------------------------- COUNTDOWN MECHANISM ------------------------------- # 
+# ---------------------------- COUNTDOWN MECHANISM ------------------------------- #
 
 def count_down(count):
     """Handles the countdown timer display and continues until 0 is reached."""
@@ -94,7 +98,7 @@ window.config(padx=100,pady=50, bg=YELLOW)
 
 # Canvas for tomato image and timer text
 pomodoro_canvas = Canvas(width=200, height=224, bg=YELLOW, highlightthickness=0)
-tomato_img = PhotoImage(file="tomato.png")  # Load tomato image
+tomato_img = PhotoImage(file=str(PROJECT_DIR / "tomato.png"))  # Load tomato image
 pomodoro_canvas.create_image(100, 112, image=tomato_img)
 timer_text = pomodoro_canvas.create_text(100, 130,text="00:00", fill="white", font=FONT)
 pomodoro_canvas.grid(row=1, column=1)

@@ -1,22 +1,26 @@
-from tkinter import *
+from tkinter import Tk, Canvas, PhotoImage, Button
 import pandas
 import random
+from pathlib import Path
 
 # ---------------------------- CONSTANTS ------------------------------- #
 BACKGROUND_COLOR = "#B1DDC6"
 TITLE_FONT = ("Times New Roman", 40, "italic")
 WORD_FONT = ("Times New Roman", 60, "bold")
+PROJECT_DIR = Path(__file__).resolve().parent
+DATA_DIR = PROJECT_DIR / "data"
+IMAGES_DIR = PROJECT_DIR / "images"
 
 current_card = {} # Stores the current flashcard being shown
-to_learn = {} # Stores the list of words that are left to learn
+to_learn = [] # Stores the list of words that are left to learn
 
 # ---------------------------- LOAD DATA ------------------------------- #
 
 try: # Try loading the progress file if it exists
-    old_data = pandas.read_csv("data/words_to_learn.csv")
+    old_data = pandas.read_csv(DATA_DIR / "words_to_learn.csv")
 
 except FileNotFoundError: # If progress file doesn't exist, load the original French words file
-    original_data = pandas.read_csv("data/french_words.csv")
+    original_data = pandas.read_csv(DATA_DIR / "french_words.csv")
     to_learn = original_data.to_dict(orient="records")
 
 else: # If progress file exists, use it
@@ -35,6 +39,13 @@ def next_card():
     """Show the next random French word card."""
 
     global current_card, flip_timer
+    if not to_learn:
+        canvas.itemconfig(label, text="Finished")
+        canvas.itemconfig(word, text="You've learned all the words!")
+        wrong_button.config(state="disabled")
+        right_button.config(state="disabled")
+        return
+
     window.after_cancel(flip_timer) # Cancel any existing timer so multiple timers don’t overlap
     current_card = random.choice(to_learn) # Pick a random word from the list
 
@@ -51,7 +62,7 @@ def is_known():
 
     to_learn.remove(current_card) # Remove the current word from learning list
     data = pandas.DataFrame(to_learn)
-    data.to_csv("data/words_to_learn.csv", index=False) # Save progress
+    data.to_csv(DATA_DIR / "words_to_learn.csv", index=False) # Save progress
     next_card() # Show the next card
 
 # ---------------------------- UI SETUP ------------------------------- #
@@ -63,8 +74,8 @@ flip_timer = window.after(3000, flip_card) # Initial flip timer (to ensure card 
 
 # Flashcard canvas setup -------------------------- #
 canvas = Canvas(width=800, height=526, bg=BACKGROUND_COLOR, highlightthickness=0)
-front_image = PhotoImage(file="images/card_front.png") # Front card image
-back_image = PhotoImage(file="images/card_back.png") # Back card image
+front_image = PhotoImage(file=str(IMAGES_DIR / "card_front.png")) # Front card image
+back_image = PhotoImage(file=str(IMAGES_DIR / "card_back.png")) # Back card image
 canvas_background = canvas.create_image(400, 263, image=front_image) # Place card image on canvas
 canvas.grid(row=0, column=0, columnspan=2)
 
@@ -73,12 +84,12 @@ label = canvas.create_text(400, 150, text="", font=TITLE_FONT)
 word = canvas.create_text(400, 280, text="", font=WORD_FONT)
 
 # Wrong button (user didn’t know the word) -------------------------- #
-wrong_image = PhotoImage(file="images/wrong.png")
+wrong_image = PhotoImage(file=str(IMAGES_DIR / "wrong.png"))
 wrong_button = Button(image=wrong_image, bg=BACKGROUND_COLOR, borderwidth=0, command=next_card)
 wrong_button.grid(row=1, column=0)
 
 # Right button (user knew the word) -------------------------- #
-right_image = PhotoImage(file="images/right.png")
+right_image = PhotoImage(file=str(IMAGES_DIR / "right.png"))
 right_button = Button(image=right_image, bg=BACKGROUND_COLOR, borderwidth=0, command=is_known)
 right_button.grid(row=1, column=1)
 

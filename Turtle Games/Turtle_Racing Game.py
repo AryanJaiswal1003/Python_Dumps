@@ -9,7 +9,8 @@ screen.setup(width=500, height=400)
 user_bet = screen.textinput(
     title="Make Your Bet",
     prompt="Which Turtle will win the Race? Enter a Color:"
-).title() # Convert input to Title Case to match color list
+)
+user_bet = user_bet.title() if user_bet else ""  # Handle cancellation before converting
 
 # List of turtle colors (6 players in the race)
 colors = ["Red", "Orange", "Yellow", "Green", "Blue", "Purple"]

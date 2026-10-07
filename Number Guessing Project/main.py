@@ -2,7 +2,7 @@ import random
 from art import logo
 
 ORIGINAL_NUM = random.randint(1, 100)
-lives = None
+lives = 0
 
 def attempts():
     global lives
@@ -25,8 +25,11 @@ def attempts():
 def play_game():
     global lives
     attempts() # Calls attempts() to set up the game and difficulty level
-    
+
     game_over = False
+    if lives == 0:
+        return
+
     while not game_over:
         user_input = int(input("Make a Guess: ")) # Get user's guess
 

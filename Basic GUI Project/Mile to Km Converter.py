@@ -1,4 +1,4 @@
-from tkinter import *
+from tkinter import Button, Entry, Label, Tk
 
 FONT = ("Times New Roman", 12, "bold")
 

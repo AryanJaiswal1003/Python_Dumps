@@ -1,7 +1,10 @@
+from pathlib import Path
 import pandas
 
+PROJECT_DIR = Path(__file__).resolve().parent
+
 # Load the squirrel census dataset into a DataFrame
-data = pandas.read_csv('2018_Central_Park_Squirrel_Census_-_Squirrel_Data.csv')
+data = pandas.read_csv(PROJECT_DIR / "2018_Central_Park_Squirrel_Census.csv")
 
 # Define the fur colors and ages we want to categorize
 primary_fur_color = ["Gray", "Black", "Cinnamon"]
@@ -19,4 +22,4 @@ for color in primary_fur_color:
 
 # Convert dictionary to DataFrame for easy saving/analysis
 df = pandas.DataFrame(list(squirrel_count.items()), columns=['Category', 'Count'])
-df.to_csv("squirrel_count.csv", index = False) # Save results into a CSV file (Category vs Count)
+df.to_csv(PROJECT_DIR / "squirrel_count.csv", index=False) # Save results into a CSV file (Category vs Count)

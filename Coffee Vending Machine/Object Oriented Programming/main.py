@@ -18,8 +18,8 @@ while not is_on:
         ordered = menu.find_drink(order_name=user_input) # Retrieve the drink object from the menu
 
         # Check if resources are sufficient & payment is successful
-        if coffee_maker.is_resource_sufficient(drink=ordered) and money_machine.make_payment(cost=ordered.cost):
-                coffee_maker.make_coffee(order=ordered)
+        if ordered is not None and coffee_maker.is_resource_sufficient(drink=ordered) and money_machine.make_payment(cost=ordered.cost):
+            coffee_maker.make_coffee(order=ordered)
 
     # If user requests a report, print current resource status
     if user_input == 'report':
