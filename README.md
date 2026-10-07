@@ -35,6 +35,14 @@ This course has been instrumental in helping me:
 * Move on to **Data Science** and **SQL** for analytics.
 * Explore **AI/ML** and **Ethical Hacking** in the future.
 
+## Installing Python dependencies
+
+Install the third-party libraries used by the projects from the repository root:
+
+```bash
+python -m pip install -r requirements.txt
+```
+
 ## Contact
 
 If you'd like to connect, discuss Python, collaborate, help me on projects, feel free to reach out!
