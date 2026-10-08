@@ -1,0 +1,100 @@
+from pprint import pprint
+from datetime import datetime, timedelta
+from data_manager import DataManager
+from flight_search import FlightSearch
+from flight_data import find_cheapest_flight
+from notification_manager import NotificationManager
+
+
+# Airport codes used only when a destination row has no IATA code.
+CITY_IATA_CODES = {
+    "paris": "CDG",
+    "frankfurt": "FRA",
+}
+
+# ==================== Setup ====================
+data_manager = DataManager()
+sheet_data = data_manager.get_destination_data()
+# pprint(sheet_data)
+
+data_manager.destination_data = sheet_data
+for destination in sheet_data:
+    if not destination.get("iataCode"):
+        city = destination.get("city", "")
+        destination["iataCode"] = CITY_IATA_CODES.get(city.strip().casefold())
+        if not destination["iataCode"]:
+            raise ValueError(
+                f"Missing IATA code for {city or 'destination'}. "
+                "Add the code to the prices sheet or define it in CITY_IATA_CODES."
+            )
+
+# ==================== Retrieve your customer emails ====================
+customer_data = data_manager.get_customer_emails()
+# Match this key to the email column name returned by your Sheety "users" endpoint.
+customer_email_list = [row["whatIsYourEmail?"] for row in customer_data]
+# print(f"Your email list includes {customer_email_list}")
+
+# ==================== Search for direct flights ====================
+tomorrow = datetime.now() + timedelta(days=1)
+six_month_from_today = datetime.now() + timedelta(days=(6 * 30))
+
+flight_search = FlightSearch()
+# Create an instance of the NotificationManager
+notification_manager = NotificationManager()
+
+ORIGIN_CITY_IATA = "LHR"  # London Heathrow
+
+
+for destination in sheet_data:
+    pprint(f"Getting flights for {destination['city']}...")
+    flights = flight_search.check_flights(
+        ORIGIN_CITY_IATA,
+        destination["iataCode"],
+        from_time=tomorrow,
+        to_time=six_month_from_today
+    )
+    cheapest_flight = find_cheapest_flight(flights, return_date=six_month_from_today.strftime("%Y-%m-%d"))
+    pprint(f"{destination['city']}: GBP {cheapest_flight.price}")
+
+
+    # Search indirect routes only when no direct fare was found.
+    if cheapest_flight.price == "N/A":
+        pprint(f"No Direct Flight to {destination['city']}! Looking for Indirect Flghts...")
+        stopsover_flights = flight_search.check_flights(
+            ORIGIN_CITY_IATA,
+            destination["iataCode"],
+            from_time=tomorrow,
+            to_time=six_month_from_today,
+            is_direct=False
+        )
+
+        cheapest_flight = find_cheapest_flight(stopsover_flights, return_date=six_month_from_today.strftime("%Y-%m-%d"))
+        pprint(f"Cheapest Indirect Flight Price is: GBP {cheapest_flight.price}")
+
+    if (
+        cheapest_flight.price != "N/A"
+        and cheapest_flight.price < destination["lowestPrice"]
+    ):
+        if cheapest_flight.stops == 0:
+            message_body = (
+                f"Low price alert! Only GBP {cheapest_flight.price} to fly direct "
+                f"from {cheapest_flight.origin_airport} to {cheapest_flight.destination_airport}, "
+                f"on {cheapest_flight.out_date} until {cheapest_flight.return_date}."
+            )
+        else:
+            message_body = (
+                f"Low price alert! Only GBP {cheapest_flight.price} to fly "
+                f"from {cheapest_flight.origin_airport} to {cheapest_flight.destination_airport}, "
+                f"with {cheapest_flight.stops} stop(s), departing on "
+                f"{cheapest_flight.out_date} and returning on {cheapest_flight.return_date}."
+            )
+
+        pprint(f"Check your email. Lower price flight found to {destination['city']}!")
+        for customer_email in customer_email_list:
+            notification_manager.send_email(
+                recipient=customer_email,
+                subject=f"Flight deal alert: {destination['city']}",
+                message_body=message_body,
+            )
+        data_manager.update_lowest_price(destination["id"], cheapest_flight.price)
+        destination["lowestPrice"] = cheapest_flight.price
